@@ -9,7 +9,6 @@ const Layout = ({ children, profile }) => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Projects', path: '/projects' },
-    { name: 'Admin', path: '/admin' },
   ];
 
   return (
@@ -109,8 +108,14 @@ const Layout = ({ children, profile }) => {
               </a>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-600">
-            © {new Date().getFullYear()} {profile.name}. All rights reserved.
+          <div className="mt-8 pt-8 border-t border-zinc-900 flex justify-between items-center">
+             <div className="text-xs text-zinc-600">
+                © {new Date().getFullYear()} {profile.name}. All rights reserved.
+             </div>
+             {/* Hidden Admin Link - Bottom Right */}
+             <Link to="/admin" className="text-zinc-900 hover:text-zinc-800 transition-colors text-[10px] select-none" aria-label="Admin Access">
+                Admin
+             </Link>
           </div>
         </div>
       </footer>

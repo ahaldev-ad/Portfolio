@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { db, auth } from "../src/firebase";
 import { INITIAL_DATA } from '../constants';
@@ -14,14 +14,12 @@ export const getAppData = async () => {
     if (docSnap.exists()) {
       return docSnap.data();
     } else {
-      // Seed database if empty
       console.log("No such document! Seeding initial data...");
       await setDoc(docRef, INITIAL_DATA);
       return INITIAL_DATA;
     }
   } catch (error) {
     console.error("Error getting document:", error);
-    // Fallback to initial data if firebase isn't configured yet
     return INITIAL_DATA;
   }
 };
@@ -30,7 +28,6 @@ export const saveAppData = async (data) => {
   try {
     const docRef = doc(db, COLLECTION, DOC_ID);
     await setDoc(docRef, data);
-    // Trigger update event
     window.dispatchEvent(new Event('storage-update'));
   } catch (error) {
     console.error("Error saving document: ", error);
@@ -54,4 +51,29 @@ export const logoutUser = async () => {
   } catch (error) {
     console.error("Logout failed", error);
   }
+};
+
+// Enquiry Functions
+export const sendEnquiry = async (data) => {
+  try {
+    await addDoc(collection(db, "enquiries"), {
+      ...data,
+      createdAt: new Date().toISOString()
+    });
+    return true;
+  } catch (e) {
+    console.error("Error adding enquiry: ", e);
+    return false;
+  }
+};
+
+export const getEnquiries = async () => {
+    try {
+        const q = query(collection(db, "enquiries"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+        console.error(e);
+        return [];
+    }
 };

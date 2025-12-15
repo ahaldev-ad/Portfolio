@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft, Briefcase, GraduationCap } from 'lucide-react';
+import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft, Briefcase, GraduationCap, Edit2, ChevronUp } from 'lucide-react';
 import { getAppData, saveAppData, logoutUser, getEnquiries } from '../services/storage';
 
 const Admin = () => {
@@ -10,6 +10,7 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingProjectId, setEditingProjectId] = useState(null);
 
   useEffect(() => {
     const loadAllData = async () => {
@@ -64,8 +65,9 @@ const Admin = () => {
   };
 
   const addProject = () => {
+    const newId = Date.now().toString();
     const newProject = {
-      id: Date.now().toString(),
+      id: newId,
       title: 'New Project',
       description: 'Project description...',
       technologies: [],
@@ -73,11 +75,14 @@ const Admin = () => {
       category: 'Web'
     };
     setData({ ...data, projects: [newProject, ...data.projects] });
+    setEditingProjectId(newId); // Automatically open the new project for editing
   };
 
-  const deleteProject = (id) => {
+  const deleteProject = (id, e) => {
+    e.stopPropagation(); // Prevent toggling edit mode if clicking delete
     if (window.confirm('Delete project?')) {
         setData({ ...data, projects: data.projects.filter(p => p.id !== id) });
+        if (editingProjectId === id) setEditingProjectId(null);
     }
   };
 
@@ -255,41 +260,78 @@ const Admin = () => {
                     <button onClick={addProject} className="w-full py-4 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium">
                         <Plus size={20} /> Add New Project
                     </button>
-                    <div className="grid grid-cols-1 gap-8">
+                    <div className="grid grid-cols-1 gap-4">
                         {data.projects.map(project => (
-                            <div key={project.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl relative">
-                                <button onClick={() => deleteProject(project.id)} className="absolute top-4 right-4 text-zinc-600 hover:text-red-400 p-2"><Trash2 size={20} /></button>
-                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                    <div className="lg:col-span-4">
-                                        <div className="aspect-video bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800 mb-4">
-                                            <img src={project.imageUrl} alt="" className="w-full h-full object-cover opacity-70" />
-                                        </div>
-                                        <InputField label="Image URL" value={project.imageUrl} onChange={v => updateProject(project.id, 'imageUrl', v)} />
-                                    </div>
-                                    <div className="lg:col-span-8 space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <InputField label="Title" value={project.title} onChange={v => updateProject(project.id, 'title', v)} />
-                                            <div>
-                                                <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Category</label>
-                                                <select className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 outline-none focus:border-indigo-500" value={project.category} onChange={e => updateProject(project.id, 'category', e.target.value)}>
-                                                    <option value="Web">Web Development</option>
-                                                    <option value="Mobile">Mobile App</option>
-                                                    <option value="Design">UI/UX Design</option>
-                                                    <option value="Other">Other</option>
-                                                </select>
+                            <div key={project.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden transition-all">
+                                {editingProjectId === project.id ? (
+                                    // EXPANDED VIEW (Editor)
+                                    <div className="p-6 relative animate-fade-in">
+                                         <div className="absolute top-4 right-4 flex gap-2">
+                                            <button onClick={() => setEditingProjectId(null)} className="text-zinc-500 hover:text-white p-2 bg-zinc-800/50 rounded-lg transition-colors" title="Collapse">
+                                                <ChevronUp size={20} />
+                                            </button>
+                                            <button onClick={(e) => deleteProject(project.id, e)} className="text-zinc-500 hover:text-red-400 p-2 bg-zinc-800/50 rounded-lg transition-colors" title="Delete">
+                                                <Trash2 size={20} />
+                                            </button>
+                                         </div>
+                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+                                            <div className="lg:col-span-4">
+                                                <div className="aspect-video bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800 mb-4">
+                                                    <img src={project.imageUrl} alt="" className="w-full h-full object-cover opacity-70" />
+                                                </div>
+                                                <InputField label="Image URL" value={project.imageUrl} onChange={v => updateProject(project.id, 'imageUrl', v)} />
+                                            </div>
+                                            <div className="lg:col-span-8 space-y-4">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <InputField label="Title" value={project.title} onChange={v => updateProject(project.id, 'title', v)} />
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Category</label>
+                                                        <select className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 outline-none focus:border-indigo-500" value={project.category} onChange={e => updateProject(project.id, 'category', e.target.value)}>
+                                                            <option value="Web">Web Development</option>
+                                                            <option value="Mobile">Mobile App</option>
+                                                            <option value="Design">UI/UX Design</option>
+                                                            <option value="Other">Other</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Description</label>
+                                                    <textarea rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none" value={project.description} onChange={e => updateProject(project.id, 'description', e.target.value)} />
+                                                </div>
+                                                <InputField label="Technologies (comma separated)" value={project.technologies.join(', ')} onChange={v => updateProject(project.id, 'technologies', v.split(',').map(t => t.trim()))} />
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <InputField label="Demo Link" value={project.demoLink || ''} onChange={v => updateProject(project.id, 'demoLink', v)} />
+                                                    <InputField label="Repo Link" value={project.repoLink || ''} onChange={v => updateProject(project.id, 'repoLink', v)} />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Description</label>
-                                            <textarea rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none" value={project.description} onChange={e => updateProject(project.id, 'description', e.target.value)} />
+                                    </div>
+                                ) : (
+                                    // COMPACT VIEW (Summary)
+                                    <div className="p-4 flex items-center gap-4 hover:bg-zinc-800/30 transition-colors">
+                                        <div className="w-16 h-12 bg-zinc-950 rounded-md overflow-hidden border border-zinc-800 flex-shrink-0">
+                                            <img src={project.imageUrl} alt="" className="w-full h-full object-cover" />
                                         </div>
-                                        <InputField label="Technologies (comma separated)" value={project.technologies.join(', ')} onChange={v => updateProject(project.id, 'technologies', v.split(',').map(t => t.trim()))} />
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <InputField label="Demo Link" value={project.demoLink || ''} onChange={v => updateProject(project.id, 'demoLink', v)} />
-                                            <InputField label="Repo Link" value={project.repoLink || ''} onChange={v => updateProject(project.id, 'repoLink', v)} />
+                                        <div className="flex-grow">
+                                             <h4 className="font-bold text-white text-lg">{project.title}</h4>
+                                             <span className="text-xs text-zinc-500 font-medium">{project.category}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button 
+                                                onClick={() => setEditingProjectId(project.id)} 
+                                                className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 rounded-lg transition-all text-sm font-medium border border-indigo-500/20"
+                                            >
+                                                <Edit2 size={16} /> Edit
+                                            </button>
+                                            <button 
+                                                onClick={(e) => deleteProject(project.id, e)} 
+                                                className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         ))}
                     </div>

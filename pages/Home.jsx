@@ -49,7 +49,7 @@ const Home = ({ data }) => {
       {/* Full Screen Hero Section */}
       <section className="min-h-screen flex items-center justify-center relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="flex flex-col items-center text-center gap-8 lg:gap-12 w-full">
-            <div className="animate-fade-in-up">
+            <div className="reveal">
                 <span className="inline-block py-1 px-3 rounded-full bg-indigo-900/30 border border-indigo-500/30 text-indigo-300 text-sm font-medium mb-6 backdrop-blur-md">
                     Available for freelance work
                 </span>
@@ -59,10 +59,10 @@ const Home = ({ data }) => {
                     {profile.title}
                   </span>
                 </h1>
-                <p className="text-lg sm:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg sm:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed reveal delay-100">
                   {profile.tagline}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center reveal delay-200">
                   <Link
                     to="/projects"
                     className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transform hover:-translate-y-1"
@@ -79,7 +79,7 @@ const Home = ({ data }) => {
             </div>
             
             {/* Scroll Indicator */}
-            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-zinc-600">
+            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-zinc-600 reveal delay-500">
                 <div className="w-6 h-10 border-2 border-zinc-600 rounded-full flex justify-center pt-2">
                     <div className="w-1 h-2 bg-zinc-600 rounded-full"></div>
                 </div>
@@ -91,7 +91,7 @@ const Home = ({ data }) => {
       <section className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div className="order-2 lg:order-1">
+                <div className="order-2 lg:order-1 reveal">
                     <h2 className="text-3xl lg:text-4xl font-bold mb-8 text-white">About Me</h2>
                     <div className="prose prose-invert text-zinc-400 text-lg leading-relaxed mb-8">
                         <p className="whitespace-pre-wrap">{profile.about}</p>
@@ -103,7 +103,7 @@ const Home = ({ data }) => {
                 </div>
                 
                 <div className="order-1 lg:order-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="bg-zinc-900/40 p-8 rounded-2xl border border-zinc-800/60 backdrop-blur-sm hover:border-indigo-500/50 transition-colors group">
+                    <div className="bg-zinc-900/40 p-8 rounded-2xl border border-zinc-800/60 backdrop-blur-sm hover:border-indigo-500/50 transition-colors group reveal delay-100">
                         <div className="w-12 h-12 bg-indigo-900/50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                              <Briefcase className="text-indigo-400" size={28} />
                         </div>
@@ -112,7 +112,7 @@ const Home = ({ data }) => {
                           {profile.experience || "Building scalable applications and digital solutions for over 5 years."}
                         </p>
                     </div>
-                    <div className="bg-zinc-900/40 p-8 rounded-2xl border border-zinc-800/60 backdrop-blur-sm hover:border-violet-500/50 transition-colors group">
+                    <div className="bg-zinc-900/40 p-8 rounded-2xl border border-zinc-800/60 backdrop-blur-sm hover:border-violet-500/50 transition-colors group reveal delay-200">
                         <div className="w-12 h-12 bg-violet-900/50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                              <GraduationCap className="text-violet-400" size={28} />
                         </div>
@@ -128,14 +128,14 @@ const Home = ({ data }) => {
 
       {/* Skills Section */}
       <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20">
+        <div className="text-center mb-20 reveal">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Technical Arsenal</h2>
             <p className="text-zinc-500 max-w-2xl mx-auto">Tools and technologies I use to craft exceptional digital experiences.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Object.keys(groupedSkills).map((category) => (
-                <div key={category} className="bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800 hover:border-indigo-500/30 hover:bg-zinc-900/60 transition-all group">
+            {Object.keys(groupedSkills).map((category, index) => (
+                <div key={category} className={`bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800 hover:border-indigo-500/30 hover:bg-zinc-900/60 transition-all group reveal delay-${Math.min((index + 1) * 100, 500)}`}>
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2.5 bg-zinc-800 rounded-lg text-indigo-400 group-hover:text-white group-hover:bg-indigo-600 transition-colors">
                             {getCategoryIcon(category)}
@@ -165,7 +165,7 @@ const Home = ({ data }) => {
 
       {/* Featured Projects */}
       <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-zinc-900/50">
-        <div className="flex flex-col sm:flex-row justify-between items-end mb-12 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-end mb-12 gap-4 reveal">
             <div>
                 <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">Featured Work</h2>
                 <p className="text-zinc-500">Highlights from my portfolio.</p>
@@ -176,8 +176,10 @@ const Home = ({ data }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {featuredProjects.map(project => (
-                <ProjectCard key={project.id} project={project} />
+            {featuredProjects.map((project, index) => (
+                <div key={project.id} className={`reveal delay-${(index + 1) * 100}`}>
+                    <ProjectCard project={project} />
+                </div>
             ))}
         </div>
       </section>
@@ -185,7 +187,7 @@ const Home = ({ data }) => {
       {/* Contact / Enquiry Section */}
       <section id="contact" className="py-24 bg-zinc-900/30 relative">
          <div className="max-w-4xl mx-auto px-4">
-             <div className="bg-zinc-900/80 backdrop-blur-xl p-8 md:p-12 rounded-3xl border border-zinc-800 shadow-2xl">
+             <div className="bg-zinc-900/80 backdrop-blur-xl p-8 md:p-12 rounded-3xl border border-zinc-800 shadow-2xl reveal">
                 <div className="text-center mb-10">
                     <h2 className="text-3xl font-bold text-white mb-4">Let's Start a Project</h2>
                     <p className="text-zinc-400">Have an idea? I'd love to help you bring it to life. Send me a message!</p>

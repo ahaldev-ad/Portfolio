@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Github, Linkedin, Mail } from 'lucide-react';
 
@@ -10,6 +10,35 @@ const Layout = ({ children, profile }) => {
     { name: 'Home', path: '/' },
     { name: 'Projects', path: '/projects' },
   ];
+
+  // Scroll Reveal Observer
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // Small timeout to ensure DOM is ready after route transition
+    const timeoutId = setTimeout(() => {
+        const reveals = document.querySelectorAll('.reveal');
+        reveals.forEach(el => observer.observe(el));
+    }, 100);
+
+    return () => {
+        observer.disconnect();
+        clearTimeout(timeoutId);
+    };
+  }, [location.pathname]); // Re-run effect when route changes
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden">

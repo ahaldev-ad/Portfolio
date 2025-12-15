@@ -13,7 +13,7 @@ const Projects = ({ data }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-24">
       <div className="text-center mb-16 reveal">
-        <h1 className="text-5xl lg:text-6xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 drop-shadow-sm">
+        <h1 className="text-4xl lg:text-5xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 drop-shadow-sm">
           My Projects
         </h1>
         <p className="text-zinc-400 max-w-2xl mx-auto text-lg leading-relaxed">

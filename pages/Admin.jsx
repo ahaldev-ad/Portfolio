@@ -86,6 +86,9 @@ const Admin = () => {
     }
   };
 
+  // Get unique categories from existing projects for suggestions
+  const existingCategories = data ? Array.from(new Set(data.projects.map(p => p.category))) : [];
+
   if (isLoading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-indigo-400"><Loader2 className="animate-spin mr-2" /> Loading Dashboard...</div>;
 
   return (
@@ -286,12 +289,28 @@ const Admin = () => {
                                                     <InputField label="Title" value={project.title} onChange={v => updateProject(project.id, 'title', v)} />
                                                     <div>
                                                         <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Category</label>
-                                                        <select className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 outline-none focus:border-indigo-500" value={project.category} onChange={e => updateProject(project.id, 'category', e.target.value)}>
-                                                            <option value="Web">Web Development</option>
-                                                            <option value="Mobile">Mobile App</option>
-                                                            <option value="Design">UI/UX Design</option>
-                                                            <option value="Other">Other</option>
-                                                        </select>
+                                                        <input 
+                                                            type="text"
+                                                            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 outline-none focus:border-indigo-500 transition-all placeholder-zinc-700"
+                                                            value={project.category}
+                                                            onChange={e => updateProject(project.id, 'category', e.target.value)}
+                                                            placeholder="Type new or select below"
+                                                        />
+                                                        <div className="flex flex-wrap gap-2 mt-2">
+                                                            {existingCategories.map(cat => (
+                                                                <button 
+                                                                    key={cat}
+                                                                    onClick={() => updateProject(project.id, 'category', cat)}
+                                                                    className={`text-xs px-2 py-1 rounded border transition-colors ${
+                                                                        project.category === cat 
+                                                                        ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
+                                                                        : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                                                                    }`}
+                                                                >
+                                                                    {cat}
+                                                                </button>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div>
@@ -338,7 +357,7 @@ const Admin = () => {
                 </div>
             )}
 
-            {/* Enquiries Tab (New) */}
+            {/* Enquiries Tab */}
             {activeTab === 'enquiries' && (
                 <div className="space-y-4">
                     {enquiries.length === 0 ? (

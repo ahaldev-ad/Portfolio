@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft } from 'lucide-react';
+import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft, Briefcase, GraduationCap } from 'lucide-react';
 import { getAppData, saveAppData, logoutUser, getEnquiries } from '../services/storage';
 
 const Admin = () => {
@@ -99,7 +99,7 @@ const Admin = () => {
         <nav className="flex-grow px-4 space-y-1">
           {[
             { id: 'profile', icon: LayoutDashboard, label: 'Profile & Bio' },
-            { id: 'skills', icon: Code, label: 'Skills' },
+            { id: 'skills', icon: Code, label: 'Skills & Highlights' },
             { id: 'projects', icon: FolderGit2, label: 'Projects' },
             { id: 'enquiries', icon: MessageSquare, label: 'Enquiries' }
           ].map((item) => (
@@ -185,26 +185,66 @@ const Admin = () => {
 
             {/* Skills Tab */}
             {activeTab === 'skills' && (
-                <div className="space-y-6">
-                    <button onClick={addSkill} className="w-full py-3 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium">
-                        <Plus size={20} /> Add New Skill
-                    </button>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {data.skills.map(skill => (
-                            <div key={skill.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex items-center gap-4 group hover:border-zinc-700 transition-colors">
-                                <div className="flex-grow grid grid-cols-2 gap-2">
-                                    <input className="bg-transparent border-b border-transparent focus:border-indigo-500 outline-none text-white font-medium" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} placeholder="Skill Name" />
-                                    <input type="number" className="bg-transparent border-b border-transparent focus:border-indigo-500 outline-none text-zinc-400 text-right" value={skill.level} onChange={e => updateSkill(skill.id, 'level', parseInt(e.target.value))} placeholder="%" />
-                                    <select className="bg-zinc-950 text-xs text-zinc-400 rounded p-1 outline-none border border-zinc-800" value={skill.category} onChange={e => updateSkill(skill.id, 'category', e.target.value)}>
-                                        <option value="Frontend">Frontend</option>
-                                        <option value="Backend">Backend</option>
-                                        <option value="Design">Design</option>
-                                        <option value="Tools">Tools</option>
-                                    </select>
+                <div className="space-y-8">
+                    {/* Highlights Section (Experience & Learning) */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+                         <h3 className="text-lg font-semibold text-white mb-6 border-b border-zinc-800 pb-4">Career Highlights</h3>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Briefcase size={16} className="text-indigo-400" />
+                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Experience Summary</label>
                                 </div>
-                                <button onClick={() => deleteSkill(skill.id)} className="text-zinc-600 hover:text-red-400 p-2"><Trash2 size={18} /></button>
+                                <textarea 
+                                    rows={3} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                                    value={data.profile.experience || ''}
+                                    onChange={e => updateProfile('experience', e.target.value)}
+                                    placeholder="Brief summary of your experience..."
+                                />
                             </div>
-                        ))}
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <GraduationCap size={16} className="text-violet-400" />
+                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Learning Goals</label>
+                                </div>
+                                <textarea 
+                                    rows={3} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                                    value={data.profile.learning || ''}
+                                    onChange={e => updateProfile('learning', e.target.value)}
+                                    placeholder="What are you currently learning?"
+                                />
+                            </div>
+                         </div>
+                    </div>
+
+                    {/* Technical Skills Section */}
+                    <div className="space-y-6">
+                         <div className="flex justify-between items-center">
+                             <h3 className="text-lg font-semibold text-white">Technical Skills</h3>
+                             <button onClick={addSkill} className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors px-4 py-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+                                <Plus size={16} /> Add Skill
+                            </button>
+                         </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {data.skills.map(skill => (
+                                <div key={skill.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex items-center gap-4 group hover:border-zinc-700 transition-colors">
+                                    <div className="flex-grow grid grid-cols-2 gap-2">
+                                        <input className="bg-transparent border-b border-transparent focus:border-indigo-500 outline-none text-white font-medium" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} placeholder="Skill Name" />
+                                        <input type="number" className="bg-transparent border-b border-transparent focus:border-indigo-500 outline-none text-zinc-400 text-right" value={skill.level} onChange={e => updateSkill(skill.id, 'level', parseInt(e.target.value))} placeholder="%" />
+                                        <select className="bg-zinc-950 text-xs text-zinc-400 rounded p-1 outline-none border border-zinc-800" value={skill.category} onChange={e => updateSkill(skill.id, 'category', e.target.value)}>
+                                            <option value="Frontend">Frontend</option>
+                                            <option value="Backend">Backend</option>
+                                            <option value="Design">Design</option>
+                                            <option value="Tools">Tools</option>
+                                        </select>
+                                    </div>
+                                    <button onClick={() => deleteSkill(skill.id)} className="text-zinc-600 hover:text-red-400 p-2"><Trash2 size={18} /></button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}

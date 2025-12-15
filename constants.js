@@ -4,6 +4,8 @@ export const INITIAL_DATA = {
     title: "Senior Full Stack Engineer",
     tagline: "Building digital experiences that matter.",
     about: "I am a passionate developer with over 5 years of experience in building scalable web applications. I specialize in the React ecosystem and cloud-native architectures. When I'm not coding, I'm exploring new UI/UX trends or contributing to open source.",
+    experience: "Building scalable applications and digital solutions for over 5 years.",
+    learning: "Constantly exploring new technologies, frameworks, and design patterns.",
     email: "hello@alexdev.com",
     github: "https://github.com",
     linkedin: "https://linkedin.com",

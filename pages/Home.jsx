@@ -108,14 +108,18 @@ const Home = ({ data }) => {
                              <Briefcase className="text-indigo-400" size={28} />
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2">Experience</h3>
-                        <p className="text-zinc-500 text-sm">Building scalable applications and digital solutions for over 5 years.</p>
+                        <p className="text-zinc-500 text-sm">
+                          {profile.experience || "Building scalable applications and digital solutions for over 5 years."}
+                        </p>
                     </div>
                     <div className="bg-zinc-900/40 p-8 rounded-2xl border border-zinc-800/60 backdrop-blur-sm hover:border-violet-500/50 transition-colors group">
                         <div className="w-12 h-12 bg-violet-900/50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                              <GraduationCap className="text-violet-400" size={28} />
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2">Learning</h3>
-                        <p className="text-zinc-500 text-sm">Constantly exploring new technologies, frameworks, and design patterns.</p>
+                        <p className="text-zinc-500 text-sm">
+                          {profile.learning || "Constantly exploring new technologies, frameworks, and design patterns."}
+                        </p>
                     </div>
                 </div>
             </div>

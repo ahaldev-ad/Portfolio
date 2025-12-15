@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2 } from 'lucide-react';
-import { getAppData, saveAppData, logout } from '../services/storage';
+import { getAppData, saveAppData, logoutUser } from '../services/storage';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -10,19 +10,23 @@ const Admin = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    setData(getAppData());
+    const loadData = async () => {
+      const fetched = await getAppData();
+      setData(fetched);
+    };
+    loadData();
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (data) {
       setIsSaving(true);
-      saveAppData(data);
-      setTimeout(() => setIsSaving(false), 800);
+      await saveAppData(data);
+      setIsSaving(false);
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logoutUser();
     navigate('/');
   };
 

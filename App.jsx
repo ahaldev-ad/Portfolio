@@ -1,37 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './src/firebase';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
 import Login from './pages/Login';
 import Admin from './pages/Admin';
-import { getAppData, checkAuth } from './services/storage';
+import { getAppData } from './services/storage';
 
-const PrivateRoute = ({ children }) => {
-  const isAuthenticated = checkAuth();
+const PrivateRoute = ({ children, isAuthenticated }) => {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
 const App = () => {
   const [data, setData] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  const loadData = () => {
-    setData(getAppData());
+  const loadData = async () => {
+    const fetchedData = await getAppData();
+    setData(fetchedData);
   };
 
   useEffect(() => {
+    // Initial Load
     loadData();
 
-    // Listen for updates from Admin panel
+    // Listen for data updates
     const handleStorageChange = () => {
       loadData();
     };
-
     window.addEventListener('storage-update', handleStorageChange);
-    return () => window.removeEventListener('storage-update', handleStorageChange);
+
+    // Listen for Auth State
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setAuthLoading(false);
+    });
+
+    return () => {
+      window.removeEventListener('storage-update', handleStorageChange);
+      unsubscribe();
+    };
   }, []);
 
-  if (!data) return <div className="h-screen flex items-center justify-center text-zinc-500">Loading Portfolio...</div>;
+  if (!data || authLoading) {
+    return <div className="h-screen flex items-center justify-center text-zinc-500">Loading Portfolio...</div>;
+  }
 
   return (
     <Router>
@@ -41,11 +57,11 @@ const App = () => {
         <Route path="/projects" element={<Layout profile={data.profile}><Projects data={data} /></Layout>} />
         
         {/* Admin Routes */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/admin/dashboard" /> : <Login />} />
         <Route 
           path="/admin/*" 
           element={
-            <PrivateRoute>
+            <PrivateRoute isAuthenticated={isAuthenticated}>
               <Admin />
             </PrivateRoute>
           } 

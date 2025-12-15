@@ -1,17 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Mail, MapPin } from 'lucide-react';
+import { ArrowRight, Mail, MapPin, Briefcase, GraduationCap, Code2, Database, Layout, Terminal } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
 
 const Home = ({ data }) => {
   const { profile, skills, projects } = data;
   const featuredProjects = projects.slice(0, 2);
 
+  // Group skills by category for the new layout
+  const groupedSkills = skills.reduce((acc, skill) => {
+    if (!acc[skill.category]) acc[skill.category] = [];
+    acc[skill.category].push(skill);
+    return acc;
+  }, {});
+
+  const getCategoryIcon = (category) => {
+    switch(category) {
+        case 'Frontend': return <Layout size={20} />;
+        case 'Backend': return <Database size={20} />;
+        case 'Tools': return <Terminal size={20} />;
+        case 'Design': return <Code2 size={20} />;
+        default: return <Code2 size={20} />;
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-24 pb-24">
+    <div className="flex flex-col pb-24">
       
       {/* Hero Section */}
-      <section className="relative pt-20 lg:pt-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <section className="relative pt-20 lg:pt-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full mb-24">
         <div className="flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-20">
           <div className="flex-1 text-center lg:text-left">
             <div className="inline-block px-3 py-1 mb-4 text-sm font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-50 rounded-full">
@@ -54,54 +71,72 @@ const Home = ({ data }) => {
         </div>
       </section>
 
-      {/* About & Skills Section */}
-      <section className="bg-white py-20 border-y border-zinc-100">
+      {/* Redesigned About Section - Dark Theme */}
+      <section className="bg-zinc-900 text-white py-24 mb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            
-            {/* About */}
-            <div>
-              <h2 className="text-3xl font-bold text-zinc-900 mb-6">About Me</h2>
-              <div className="prose prose-zinc text-zinc-600 leading-relaxed mb-8">
-                <p className="whitespace-pre-wrap">{profile.about}</p>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-500 mb-8">
-                <MapPin size={18} />
-                <span>{profile.location}</span>
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div>
-              <h2 className="text-3xl font-bold text-zinc-900 mb-8">Skills & Expertise</h2>
-              <div className="space-y-6">
-                {skills.map((skill) => (
-                  <div key={skill.id}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-zinc-700">{skill.name}</span>
-                      <span className="text-xs font-medium text-zinc-500">{skill.level}%</span>
+            <div className="flex flex-col lg:flex-row gap-16 items-start">
+                <div className="lg:w-1/2">
+                    <h2 className="text-3xl font-bold mb-6 text-indigo-400">About Me</h2>
+                    <div className="prose prose-invert text-zinc-400 text-lg leading-relaxed mb-8">
+                        <p className="whitespace-pre-wrap">{profile.about}</p>
                     </div>
-                    <div className="w-full bg-zinc-100 rounded-full h-2.5">
-                      <div
-                        className="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000"
-                        style={{ width: `${skill.level}%` }}
-                      ></div>
+                    <div className="flex items-center gap-2 text-zinc-400">
+                        <MapPin size={20} className="text-indigo-500" />
+                        <span>Based in {profile.location}</span>
                     </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-10 flex flex-wrap gap-2">
-                 <h3 className="w-full text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Tech Stack</h3>
-                 {skills.map(s => (
-                    <span key={s.id + '_badge'} className="px-3 py-1 bg-zinc-50 border border-zinc-200 rounded-full text-xs font-medium text-zinc-600">
-                        {s.name}
-                    </span>
-                 ))}
-              </div>
+                </div>
+                
+                {/* Visual Stats / Info Cards */}
+                <div className="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                    <div className="bg-zinc-800 p-6 rounded-2xl border border-zinc-700 hover:border-indigo-500 transition-colors">
+                        <Briefcase className="text-indigo-400 mb-4" size={32} />
+                        <h3 className="text-xl font-semibold mb-2">Experience</h3>
+                        <p className="text-zinc-400 text-sm">5+ years building scalable applications and digital solutions.</p>
+                    </div>
+                    <div className="bg-zinc-800 p-6 rounded-2xl border border-zinc-700 hover:border-indigo-500 transition-colors">
+                        <GraduationCap className="text-indigo-400 mb-4" size={32} />
+                        <h3 className="text-xl font-semibold mb-2">Continuous Learning</h3>
+                        <p className="text-zinc-400 text-sm">Always exploring new technologies and UI/UX trends.</p>
+                    </div>
+                </div>
             </div>
+        </div>
+      </section>
 
-          </div>
+      {/* Redesigned Skills Section - Grid Layout */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+        <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-zinc-900 mb-4">Technical Proficiency</h2>
+            <p className="text-zinc-500 max-w-2xl mx-auto">A breakdown of my technical skills and the tools I use to bring ideas to life.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Object.keys(groupedSkills).map((category) => (
+                <div key={category} className="bg-white p-6 rounded-2xl shadow-sm border border-zinc-100 hover:shadow-md transition-all">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                            {getCategoryIcon(category)}
+                        </div>
+                        <h3 className="font-bold text-lg text-zinc-900">{category}</h3>
+                    </div>
+                    <div className="space-y-4">
+                        {groupedSkills[category].map(skill => (
+                            <div key={skill.id}>
+                                <div className="flex justify-between mb-1">
+                                    <span className="text-sm font-medium text-zinc-700">{skill.name}</span>
+                                    <span className="text-xs text-zinc-400">{skill.level}%</span>
+                                </div>
+                                <div className="w-full bg-zinc-100 rounded-full h-1.5">
+                                    <div 
+                                        className="bg-indigo-600 h-1.5 rounded-full" 
+                                        style={{ width: `${skill.level}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
       </section>
 
@@ -131,7 +166,7 @@ const Home = ({ data }) => {
       </section>
 
       {/* Simple Contact CTA */}
-      <section className="bg-zinc-900 text-white py-20">
+      <section className="bg-zinc-900 text-white py-20 mt-24">
          <div className="max-w-4xl mx-auto px-4 text-center">
              <h2 className="text-3xl md:text-4xl font-bold mb-6">Interested in working together?</h2>
              <p className="text-zinc-400 text-lg mb-8">

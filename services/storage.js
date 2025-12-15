@@ -1,42 +1,57 @@
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { db, auth } from "../src/firebase";
 import { INITIAL_DATA } from '../constants';
 
-const STORAGE_KEY = 'portfolio_data_v1';
-const AUTH_KEY = 'portfolio_auth_session';
+const DOC_ID = "portfolio_content";
+const COLLECTION = "settings";
 
-export const getAppData = () => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (!stored) {
-    // Initialize with default data if empty
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DATA));
-    return INITIAL_DATA;
-  }
+export const getAppData = async () => {
   try {
-    return JSON.parse(stored);
-  } catch (e) {
-    console.error("Failed to parse portfolio data", e);
+    const docRef = doc(db, COLLECTION, DOC_ID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      // Seed database if empty
+      console.log("No such document! Seeding initial data...");
+      await setDoc(docRef, INITIAL_DATA);
+      return INITIAL_DATA;
+    }
+  } catch (error) {
+    console.error("Error getting document:", error);
+    // Fallback to initial data if firebase isn't configured yet
     return INITIAL_DATA;
   }
 };
 
-export const saveAppData = (data) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  // Dispatch a custom event so components can subscribe to changes across the app
-  window.dispatchEvent(new Event('storage-update'));
-};
-
-export const checkAuth = () => {
-  return localStorage.getItem(AUTH_KEY) === 'true';
-};
-
-export const login = (pass) => {
-  // Simple mock login
-  if (pass === 'password123') {
-    localStorage.setItem(AUTH_KEY, 'true');
-    return true;
+export const saveAppData = async (data) => {
+  try {
+    const docRef = doc(db, COLLECTION, DOC_ID);
+    await setDoc(docRef, data);
+    // Trigger update event
+    window.dispatchEvent(new Event('storage-update'));
+  } catch (error) {
+    console.error("Error saving document: ", error);
+    throw error;
   }
-  return false;
 };
 
-export const logout = () => {
-  localStorage.removeItem(AUTH_KEY);
+export const loginUser = async (email, password) => {
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    return true;
+  } catch (error) {
+    console.error("Login failed", error);
+    return false;
+  }
+};
+
+export const logoutUser = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Logout failed", error);
+  }
 };

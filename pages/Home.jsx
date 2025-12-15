@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Mail, MapPin, Briefcase, GraduationCap, Code2, Database, Layout, Terminal, Send, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Mail, MapPin, Briefcase, GraduationCap, Code2, Database, Layout, Terminal, Send, CheckCircle2, Github, Linkedin, Cpu, Globe } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
 import { sendEnquiry } from '../services/storage';
 
@@ -47,10 +47,14 @@ const Home = ({ data }) => {
     <div className="flex flex-col">
       
       {/* Full Screen Hero Section */}
-      <section className="min-h-screen flex items-center justify-center relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <div className="flex flex-col items-center text-center gap-8 lg:gap-12 w-full">
+      <section className="min-h-screen flex items-center justify-center relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pt-16 md:pt-0">
+        <div className="flex flex-col items-center text-center gap-8 lg:gap-10 w-full">
             <div className="reveal">
-                <span className="inline-block py-1 px-3 rounded-full bg-indigo-900/30 border border-indigo-500/30 text-indigo-300 text-sm font-medium mb-6 backdrop-blur-md">
+                <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-indigo-950/30 border border-indigo-500/20 text-indigo-300 text-sm font-medium mb-8 backdrop-blur-md shadow-lg shadow-indigo-500/10">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
                     Available for freelance work
                 </span>
                 <h1 className="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-tight text-white mb-6">
@@ -76,10 +80,37 @@ const Home = ({ data }) => {
                     Contact Me <Mail className="ml-2" size={20} />
                   </a>
                 </div>
+
+                {/* Social Links & Tech Stack Indicators */}
+                <div className="mt-12 flex flex-col items-center gap-6 reveal delay-300">
+                    <div className="flex gap-4">
+                        <a href={profile.github} target="_blank" rel="noreferrer" className="p-3 bg-zinc-900/30 rounded-full border border-zinc-800 text-zinc-400 hover:text-white hover:border-indigo-500/50 hover:bg-indigo-600/10 transition-all duration-300 hover:scale-110">
+                            <Github size={20} />
+                        </a>
+                        <a href={profile.linkedin} target="_blank" rel="noreferrer" className="p-3 bg-zinc-900/30 rounded-full border border-zinc-800 text-zinc-400 hover:text-white hover:border-indigo-500/50 hover:bg-indigo-600/10 transition-all duration-300 hover:scale-110">
+                            <Linkedin size={20} />
+                        </a>
+                         <a href={`mailto:${profile.email}`} className="p-3 bg-zinc-900/30 rounded-full border border-zinc-800 text-zinc-400 hover:text-white hover:border-indigo-500/50 hover:bg-indigo-600/10 transition-all duration-300 hover:scale-110">
+                            <Mail size={20} />
+                        </a>
+                    </div>
+                    
+                    <div className="flex items-center gap-8 mt-4 pt-8 border-t border-zinc-800/50 w-full max-w-lg mx-auto justify-center opacity-60 hover:opacity-100 transition-opacity duration-500">
+                        <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
+                            <Cpu size={16} /> <span>Engineering</span>
+                        </div>
+                         <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
+                            <Globe size={16} /> <span>Development</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
+                            <Layout size={16} /> <span>Design</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             {/* Scroll Indicator */}
-            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-zinc-600 reveal delay-500">
+            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-zinc-600 reveal delay-500 hidden lg:block">
                 <div className="w-6 h-10 border-2 border-zinc-600 rounded-full flex justify-center pt-2">
                     <div className="w-1 h-2 bg-zinc-600 rounded-full"></div>
                 </div>

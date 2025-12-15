@@ -43,11 +43,11 @@ const Layout = ({ children, profile }) => {
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden">
       
-      {/* Neon Gradient Blobs */}
+      {/* Dynamic Background Blobs */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
-        <div className="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-violet-600/20 rounded-full blur-[100px] mix-blend-screen"></div>
-        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[150px] mix-blend-screen"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] mix-blend-screen animate-blob"></div>
+        <div className="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-violet-600/20 rounded-full blur-[100px] mix-blend-screen animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[150px] mix-blend-screen animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Navigation */}

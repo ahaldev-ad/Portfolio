@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, updateDoc } from "firebase/firestore";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { db, auth } from "../src/firebase";
 import { INITIAL_DATA } from '../constants';
@@ -58,6 +58,7 @@ export const sendEnquiry = async (data) => {
   try {
     await addDoc(collection(db, "enquiries"), {
       ...data,
+      replied: false,
       createdAt: new Date().toISOString()
     });
     return true;
@@ -75,5 +76,16 @@ export const getEnquiries = async () => {
     } catch (e) {
         console.error(e);
         return [];
+    }
+};
+
+export const markEnquiryAsReplied = async (enquiryId) => {
+    try {
+        const docRef = doc(db, "enquiries", enquiryId);
+        await updateDoc(docRef, { replied: true });
+        return true;
+    } catch (e) {
+        console.error("Error updating enquiry:", e);
+        return false;
     }
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft, Briefcase, GraduationCap, Edit2, ChevronUp, Menu, X } from 'lucide-react';
-import { getAppData, saveAppData, logoutUser, getEnquiries } from '../services/storage';
+import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft, Briefcase, GraduationCap, Edit2, ChevronUp, Menu, X, Reply, Send, CheckCircle } from 'lucide-react';
+import { getAppData, saveAppData, logoutUser, getEnquiries, markEnquiryAsReplied } from '../services/storage';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -12,6 +12,10 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Enquiry specific states
+  const [replyingToId, setReplyingToId] = useState(null);
+  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
     const loadAllData = async () => {
@@ -40,13 +44,11 @@ const Admin = () => {
     navigate('/');
   };
 
-  // Tab switching with auto-close sidebar on mobile
   const switchTab = (tabId) => {
     setActiveTab(tabId);
     setIsSidebarOpen(false);
   };
 
-  // Generic Update Handlers
   const updateProfile = (field, value) => {
     if (!data) return;
     setData({ ...data, profile: { ...data.profile, [field]: value } });
@@ -91,6 +93,21 @@ const Admin = () => {
         setData({ ...data, projects: data.projects.filter(p => p.id !== id) });
         if (editingProjectId === id) setEditingProjectId(null);
     }
+  };
+
+  const handleMarkAsReplied = async (id) => {
+    const success = await markEnquiryAsReplied(id);
+    if (success) {
+      setEnquiries(enquiries.map(e => e.id === id ? { ...e, replied: true } : e));
+      setReplyingToId(null);
+    }
+  };
+
+  const handleSendEmail = (enquiry) => {
+    const subject = encodeURIComponent(`Re: Project Inquiry from ${enquiry.name}`);
+    const body = encodeURIComponent(replyText);
+    window.location.href = `mailto:${enquiry.email}?subject=${subject}&body=${body}`;
+    handleMarkAsReplied(enquiry.id);
   };
 
   const existingCategories = data ? Array.from(new Set(data.projects.map(p => p.category))) : [];
@@ -208,19 +225,6 @@ const Admin = () => {
                             </div>
                         </div>
                     </div>
-                    
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 md:p-6">
-                        <h3 className="text-lg font-semibold text-white mb-6 border-b border-zinc-800 pb-4">Contact & Media</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                            <InputField label="Email" type="email" value={data.profile.email} onChange={v => updateProfile('email', v)} />
-                            <InputField label="Location" value={data.profile.location} onChange={v => updateProfile('location', v)} />
-                            <InputField label="GitHub" value={data.profile.github} onChange={v => updateProfile('github', v)} />
-                            <InputField label="LinkedIn" value={data.profile.linkedin} onChange={v => updateProfile('linkedin', v)} />
-                            <div className="md:col-span-2">
-                                <InputField label="Hero Image URL" value={data.profile.heroImage} onChange={v => updateProfile('heroImage', v)} />
-                            </div>
-                        </div>
-                    </div>
                 </div>
             )}
 
@@ -325,21 +329,6 @@ const Admin = () => {
                                                             value={project.category}
                                                             onChange={e => updateProject(project.id, 'category', e.target.value)}
                                                         />
-                                                        <div className="flex flex-wrap gap-2 mt-2">
-                                                            {existingCategories.map(cat => (
-                                                                <button 
-                                                                    key={cat}
-                                                                    onClick={() => updateProject(project.id, 'category', cat)}
-                                                                    className={`text-[10px] uppercase tracking-tighter px-2 py-0.5 rounded border transition-colors ${
-                                                                        project.category === cat 
-                                                                        ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
-                                                                        : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:text-white'
-                                                                    }`}
-                                                                >
-                                                                    {cat}
-                                                                </button>
-                                                            ))}
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div>
@@ -394,15 +383,65 @@ const Admin = () => {
                         </div>
                     ) : (
                         enquiries.map(enquiry => (
-                            <div key={enquiry.id} className="bg-zinc-900 border border-zinc-800 p-5 md:p-6 rounded-xl hover:border-indigo-500/30 transition-colors">
-                                <div className="flex justify-between items-start mb-2 gap-2">
-                                    <h4 className="text-base md:text-lg font-bold text-white leading-tight">{enquiry.name}</h4>
-                                    <span className="text-[10px] text-zinc-500 whitespace-nowrap">{new Date(enquiry.createdAt).toLocaleDateString()}</span>
+                            <div key={enquiry.id} className={`bg-zinc-900 border transition-all duration-300 rounded-2xl overflow-hidden ${enquiry.replied ? 'border-green-900/30 opacity-75' : 'border-zinc-800'}`}>
+                                <div className="p-5 md:p-6">
+                                    <div className="flex justify-between items-start mb-2 gap-2">
+                                        <div className="flex items-center gap-3">
+                                            <h4 className="text-base md:text-lg font-bold text-white leading-tight">{enquiry.name}</h4>
+                                            {enquiry.replied && (
+                                                <span className="flex items-center gap-1 bg-green-500/10 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-500/20">
+                                                    <CheckCircle size={10} /> REPLIED
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="text-[10px] text-zinc-500 whitespace-nowrap">{new Date(enquiry.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                    <div className="text-indigo-400 text-xs md:text-sm mb-4 truncate">{enquiry.email}</div>
+                                    <p className="text-zinc-300 text-sm bg-zinc-950 p-4 rounded-lg border border-zinc-800 leading-relaxed overflow-wrap-anywhere mb-4">
+                                        {enquiry.message}
+                                    </p>
+
+                                    {/* Action Row */}
+                                    <div className="flex items-center justify-between gap-4">
+                                        <button 
+                                            onClick={() => setReplyingToId(replyingToId === enquiry.id ? null : enquiry.id)}
+                                            className="flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 px-3 py-2 bg-indigo-500/10 rounded-lg transition-colors"
+                                        >
+                                            <Reply size={14} /> {replyingToId === enquiry.id ? 'Cancel Reply' : 'Reply Now'}
+                                        </button>
+                                        
+                                        {!enquiry.replied && (
+                                            <button 
+                                                onClick={() => handleMarkAsReplied(enquiry.id)}
+                                                className="text-[10px] font-bold text-zinc-500 hover:text-zinc-300 uppercase tracking-wider"
+                                            >
+                                                Mark as Replied
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="text-indigo-400 text-xs md:text-sm mb-4 truncate">{enquiry.email}</div>
-                                <p className="text-zinc-300 text-sm bg-zinc-950 p-4 rounded-lg border border-zinc-800 leading-relaxed overflow-wrap-anywhere">
-                                    {enquiry.message}
-                                </p>
+
+                                {/* Integrated Reply Composer */}
+                                {replyingToId === enquiry.id && (
+                                    <div className="bg-zinc-950 p-5 md:p-6 border-t border-zinc-800 animate-slide-down">
+                                        <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Compose Reply</label>
+                                        <textarea 
+                                            value={replyText}
+                                            onChange={(e) => setReplyText(e.target.value)}
+                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-200 focus:border-indigo-500 outline-none transition-all placeholder-zinc-700 mb-4"
+                                            rows={4}
+                                            placeholder={`Hey ${enquiry.name.split(' ')[0]}, thanks for reaching out! I'd love to help with...`}
+                                        />
+                                        <div className="flex justify-end gap-3">
+                                            <button 
+                                                onClick={() => handleSendEmail(enquiry)}
+                                                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/20"
+                                            >
+                                                <Send size={14} /> Send via Email Client
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))
                     )}

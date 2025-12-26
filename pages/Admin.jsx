@@ -4,7 +4,8 @@ import {
   Save, Plus, Trash2, LogOut, LayoutDashboard, Code, 
   FolderGit2, MessageSquare, Loader2, ArrowLeft, 
   Briefcase, GraduationCap, Edit2, ChevronUp, 
-  Menu, X, Reply, Send, CheckCircle, Settings, Mail, Star
+  Menu, X, Reply, Send, CheckCircle, Settings, Mail, Star,
+  Github, Linkedin, Twitter, MapPin, ImageIcon, User
 } from 'lucide-react';
 import { getAppData, saveAppData, logoutUser, getEnquiries, markEnquiryAsReplied } from '../services/storage';
 
@@ -128,14 +129,9 @@ const Admin = () => {
 
   const handleDirectSend = async (enquiry) => {
     if (!replyText.trim()) return;
-    
     setIsSendingReply(true);
-    
-    // Simulation of a direct email dispatch
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
     console.log(`[ACTION] Direct Email Sent to ${enquiry.email}`);
-    
     const success = await markEnquiryAsReplied(enquiry.id);
     if (success) {
       setEnquiries(prev => prev.map(item => item.id === enquiry.id ? {...item, replied: true} : item));
@@ -143,14 +139,13 @@ const Admin = () => {
       setReplyText('');
       alert(`Email sent successfully to ${enquiry.email}!`);
     }
-    
     setIsSendingReply(false);
   };
 
   if (isLoading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-indigo-400"><Loader2 className="animate-spin mr-2" /> Loading Dashboard...</div>;
 
   const NavItems = [
-    { id: 'profile', icon: LayoutDashboard, label: 'Profile' },
+    { id: 'profile', icon: User, label: 'Profile' },
     { id: 'skills', icon: Code, label: 'Skills' },
     { id: 'projects', icon: FolderGit2, label: 'Projects' },
     { id: 'enquiries', icon: MessageSquare, label: 'Enquiries' },
@@ -246,10 +241,36 @@ const Admin = () => {
 
             {/* Profile Tab */}
             {activeTab === 'profile' && (
-                <div className="grid grid-cols-1 gap-6 md:gap-8">
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 md:p-6">
-                        <h3 className="text-lg font-semibold text-white mb-6 border-b border-zinc-800 pb-4">Personal Details</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                <div className="grid grid-cols-1 gap-8">
+                    {/* Visuals: Hero Image */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+                        <div className="flex items-center gap-3 mb-6 border-b border-zinc-800 pb-4">
+                            <ImageIcon className="text-indigo-400" size={20} />
+                            <h3 className="text-lg font-semibold text-white">Visual Presence</h3>
+                        </div>
+                        <div className="flex flex-col md:flex-row gap-6 items-start">
+                            <div className="w-32 h-32 bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-800 shrink-0">
+                                <img src={data.profile.heroImage} alt="Preview" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-grow w-full">
+                                <InputField 
+                                    label="Hero Image URL" 
+                                    value={data.profile.heroImage} 
+                                    onChange={v => updateProfile('heroImage', v)} 
+                                    placeholder="https://images.unsplash.com/..."
+                                />
+                                <p className="text-[10px] text-zinc-500 mt-2">Recommended: Square aspect ratio, high resolution.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Personal Details */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+                        <div className="flex items-center gap-3 mb-6 border-b border-zinc-800 pb-4">
+                            <User className="text-indigo-400" size={20} />
+                            <h3 className="text-lg font-semibold text-white">Identity & Bio</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <InputField label="Full Name" value={data.profile.name} onChange={v => updateProfile('name', v)} />
                             <InputField label="Job Title" value={data.profile.title} onChange={v => updateProfile('title', v)} />
                             <div className="md:col-span-2">
@@ -257,7 +278,26 @@ const Admin = () => {
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">About Bio</label>
-                                <textarea rows={6} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all" value={data.profile.about} onChange={e => updateProfile('about', e.target.value)} />
+                                <textarea rows={6} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none transition-all" value={data.profile.about} onChange={e => updateProfile('about', e.target.value)} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Social & Contact */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+                        <div className="flex items-center gap-3 mb-6 border-b border-zinc-800 pb-4">
+                            <Globe className="text-indigo-400" size={20} />
+                            <h3 className="text-lg font-semibold text-white">Contact & Social Links</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-6">
+                                <InputField label="Public Email Address" value={data.profile.email} onChange={v => updateProfile('email', v)} icon={<Mail size={14}/>} />
+                                <InputField label="Location" value={data.profile.location} onChange={v => updateProfile('location', v)} icon={<MapPin size={14}/>} />
+                            </div>
+                            <div className="space-y-6">
+                                <InputField label="GitHub Profile URL" value={data.profile.github} onChange={v => updateProfile('github', v)} icon={<Github size={14}/>} />
+                                <InputField label="LinkedIn Profile URL" value={data.profile.linkedin} onChange={v => updateProfile('linkedin', v)} icon={<Linkedin size={14}/>} />
+                                <InputField label="Twitter/X Profile URL" value={data.profile.twitter || ''} onChange={v => updateProfile('twitter', v)} icon={<Twitter size={14}/>} />
                             </div>
                         </div>
                     </div>
@@ -272,11 +312,11 @@ const Admin = () => {
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                             <div>
                                 <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Experience Summary</label>
-                                <textarea rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none transition-all" value={data.profile.experience || ''} onChange={e => updateProfile('experience', e.target.value)} placeholder="Experience..." />
+                                <textarea rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none transition-all" value={data.profile.experience || ''} onChange={e => updateProfile('experience', e.target.value)} placeholder="Years of experience, industries..." />
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Learning Goals</label>
-                                <textarea rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none transition-all" value={data.profile.learning || ''} onChange={e => updateProfile('learning', e.target.value)} placeholder="Learning..." />
+                                <textarea rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none transition-all" value={data.profile.learning || ''} onChange={e => updateProfile('learning', e.target.value)} placeholder="Technologies you are currently exploring..." />
                             </div>
                          </div>
                     </div>
@@ -291,7 +331,7 @@ const Admin = () => {
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {data.skills.map(skill => (
-                                <div key={skill.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex items-center gap-4 group">
+                                <div key={skill.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex items-center gap-4 group shadow-sm hover:shadow-indigo-500/5 transition-all">
                                     <div className="flex-grow grid grid-cols-2 gap-2">
                                         <input className="bg-transparent border-b border-zinc-800 focus:border-indigo-500 outline-none text-white font-medium" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} placeholder="Skill" />
                                         <input type="number" className="bg-transparent border-b border-zinc-800 focus:border-indigo-500 outline-none text-zinc-400 text-right" value={skill.level} onChange={e => updateSkill(skill.id, 'level', parseInt(e.target.value))} />
@@ -313,7 +353,7 @@ const Admin = () => {
             {/* Projects Tab */}
             {activeTab === 'projects' && (
                 <div className="space-y-6">
-                    <button onClick={addProject} className="w-full py-6 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium">
+                    <button onClick={addProject} className="w-full py-6 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium bg-zinc-900/30">
                         <Plus size={20} /> Add New Project
                     </button>
                     <div className="grid grid-cols-1 gap-4">
@@ -344,7 +384,7 @@ const Admin = () => {
                                          </div>
                                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                                             <div className="lg:col-span-4">
-                                                <div className="aspect-video bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800 mb-4">
+                                                <div className="aspect-video bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800 mb-4 shadow-inner">
                                                     <img src={project.imageUrl} alt="" className="w-full h-full object-cover opacity-70" />
                                                 </div>
                                                 <InputField label="Image URL" value={project.imageUrl} onChange={v => updateProject(project.id, 'imageUrl', v)} />
@@ -367,7 +407,7 @@ const Admin = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="p-4 flex flex-col sm:flex-row items-center gap-4 hover:bg-zinc-800/30 transition-colors">
+                                    <div className="p-4 flex flex-col sm:flex-row items-center gap-4 hover:bg-zinc-800/30 transition-colors group cursor-pointer" onClick={() => setEditingProjectId(project.id)}>
                                         <div className="w-20 h-14 bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 flex-shrink-0 relative">
                                             <img src={project.imageUrl} alt="" className="w-full h-full object-cover" />
                                             {project.isFeatured && (
@@ -378,16 +418,16 @@ const Admin = () => {
                                         </div>
                                         <div className="flex-grow">
                                              <div className="flex items-center gap-2">
-                                                <h4 className="font-bold text-white">{project.title}</h4>
+                                                <h4 className="font-bold text-white group-hover:text-indigo-400 transition-colors">{project.title}</h4>
                                                 {project.isFeatured && <Star size={14} className="text-indigo-400 fill-indigo-400" />}
                                              </div>
-                                             <span className="text-xs text-zinc-500">{project.category}</span>
+                                             <span className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">{project.category}</span>
                                         </div>
                                         <div className="flex gap-2">
-                                            <button onClick={() => setEditingProjectId(project.id)} className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 rounded-lg transition-all text-sm font-medium border border-indigo-500/20">
+                                            <button onClick={(e) => { e.stopPropagation(); setEditingProjectId(project.id); }} className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 rounded-lg transition-all text-sm font-medium border border-indigo-500/20">
                                                 <Edit2 size={16} /> Edit
                                             </button>
-                                            <button onClick={(e) => deleteProject(project.id, e)} className="p-2 text-zinc-500 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
+                                            <button onClick={(e) => { e.stopPropagation(); deleteProject(project.id, e); }} className="p-2 text-zinc-500 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
                                         </div>
                                     </div>
                                 )}
@@ -419,7 +459,7 @@ const Admin = () => {
                                         </div>
                                         <span className="text-[10px] text-zinc-500 whitespace-nowrap">{new Date(enquiry.createdAt).toLocaleDateString()}</span>
                                     </div>
-                                    <div className="text-indigo-400 text-sm mb-4">{enquiry.email}</div>
+                                    <div className="text-indigo-400 text-sm mb-4 font-mono">{enquiry.email}</div>
                                     <p className="text-zinc-300 text-sm bg-zinc-950 p-4 rounded-lg border border-zinc-800 leading-relaxed mb-4">
                                         {enquiry.message}
                                     </p>
@@ -520,13 +560,17 @@ const Admin = () => {
   );
 };
 
-const InputField = ({ label, value, onChange, type = "text" }) => (
+const InputField = ({ label, value, onChange, type = "text", placeholder = "", icon = null }) => (
     <div className="w-full">
-        <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">{label}</label>
+        <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+            {icon}
+            {label}
+        </label>
         <input 
             type={type} 
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all placeholder-zinc-700" 
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all placeholder-zinc-700" 
             value={value} 
+            placeholder={placeholder}
             onChange={e => onChange(e.target.value)} 
         />
     </div>

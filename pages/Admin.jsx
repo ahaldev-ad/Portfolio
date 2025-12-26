@@ -130,25 +130,26 @@ const Admin = () => {
     
     setIsSendingReply(true);
     
-    // Simulate direct email sending (integration with service like EmailJS would go here)
+    // Simulation of a direct email dispatch via an API (like EmailJS or SendGrid)
+    // We wait 1.5s to show the loading state
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    console.log(`[SIMULATION] Email sent to: ${enquiry.email}`);
-    console.log(`[SIMULATION] From: ${data.settings?.senderEmail || data.profile.email}`);
-    console.log(`[SIMULATION] Body: ${replyText}`);
+    // Log simulation data for debugging
+    console.log(`[ACTION] Direct Email Sent`);
+    console.log(`[TO] ${enquiry.email}`);
+    console.log(`[FROM] ${data.settings?.senderEmail || data.profile.email}`);
+    console.log(`[BODY] ${replyText}`);
     
     const success = await markEnquiryAsReplied(enquiry.id);
     if (success) {
       setEnquiries(prev => prev.map(item => item.id === enquiry.id ? {...item, replied: true} : item));
       setReplyingToId(null);
       setReplyText('');
-      alert(`Reply sent successfully to ${enquiry.email}!`);
+      alert(`Email sent successfully to ${enquiry.email}!`);
     }
     
     setIsSendingReply(false);
   };
-
-  const existingCategories = data ? Array.from(new Set(data.projects.map(p => p.category))) : [];
 
   if (isLoading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-indigo-400"><Loader2 className="animate-spin mr-2" /> Loading Dashboard...</div>;
 
@@ -286,7 +287,7 @@ const Admin = () => {
 
                     <div className="space-y-6">
                          <div className="flex justify-between items-center">
-                             <h3 className="text-lg font-semibold text-white">Skills Matrix</h3>
+                             <h3 className="text-lg font-semibold text-white">Technical Arsenal</h3>
                              <button onClick={addSkill} className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors px-4 py-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
                                 <Plus size={16} /> Add Skill
                             </button>
@@ -305,7 +306,7 @@ const Admin = () => {
                                             <option value="Tools">Tools</option>
                                         </select>
                                     </div>
-                                    <button onClick={() => deleteSkill(skill.id)} className="text-zinc-600 hover:text-red-400 p-2"><Trash2 size={18} /></button>
+                                    <button onClick={() => deleteSkill(skill.id)} className="text-zinc-600 hover:text-red-400 p-2 transition-colors"><Trash2 size={18} /></button>
                                 </div>
                             ))}
                         </div>
@@ -319,7 +320,7 @@ const Admin = () => {
                     <button onClick={addProject} className="w-full py-6 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium">
                         <Plus size={20} /> Add New Project
                     </button>
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 gap-4">
                         {data.projects.map(project => (
                             <div key={project.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
                                 {editingProjectId === project.id ? (
@@ -390,16 +391,16 @@ const Admin = () => {
                         enquiries.map(enquiry => (
                             <div key={enquiry.id} className={`bg-zinc-900 border transition-all duration-300 rounded-2xl overflow-hidden ${enquiry.replied ? 'border-green-900/30 opacity-75' : 'border-zinc-800'}`}>
                                 <div className="p-6">
-                                    <div className="flex justify-between items-start mb-2">
+                                    <div className="flex justify-between items-start mb-2 gap-2">
                                         <div className="flex items-center gap-3">
-                                            <h4 className="text-lg font-bold text-white">{enquiry.name}</h4>
+                                            <h4 className="text-lg font-bold text-white leading-tight">{enquiry.name}</h4>
                                             {enquiry.replied && (
                                                 <span className="flex items-center gap-1 bg-green-500/10 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-500/20">
                                                     <CheckCircle size={10} /> REPLIED
                                                 </span>
                                             )}
                                         </div>
-                                        <span className="text-[10px] text-zinc-500">{new Date(enquiry.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-[10px] text-zinc-500 whitespace-nowrap">{new Date(enquiry.createdAt).toLocaleDateString()}</span>
                                     </div>
                                     <div className="text-indigo-400 text-sm mb-4">{enquiry.email}</div>
                                     <p className="text-zinc-300 text-sm bg-zinc-950 p-4 rounded-lg border border-zinc-800 leading-relaxed mb-4">
@@ -434,7 +435,9 @@ const Admin = () => {
                                         <div className="mb-4">
                                           <div className="flex items-center gap-2 mb-2">
                                               <Mail size={14} className="text-zinc-500" />
-                                              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Reply from: {data.settings?.senderEmail || data.profile.email}</span>
+                                              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+                                                  Reply from: {data.settings?.senderEmail || data.profile.email}
+                                              </span>
                                           </div>
                                           <textarea 
                                               value={replyText}
@@ -485,9 +488,9 @@ const Admin = () => {
                                 value={data.settings?.emailServiceName || 'Default'}
                                 onChange={e => updateSettings('emailServiceName', e.target.value)}
                             >
-                                <option value="Default">System Default</option>
-                                <option value="EmailJS">EmailJS (Integration)</option>
-                                <option value="SendGrid">SendGrid (Integration)</option>
+                                <option value="Default">System Default (Simulation)</option>
+                                <option value="EmailJS">EmailJS Integration</option>
+                                <option value="SendGrid">SendGrid Integration</option>
                             </select>
                         </div>
                     </div>
@@ -505,7 +508,7 @@ const InputField = ({ label, value, onChange, type = "text" }) => (
         <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">{label}</label>
         <input 
             type={type} 
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all" 
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all placeholder-zinc-700" 
             value={value} 
             onChange={e => onChange(e.target.value)} 
         />

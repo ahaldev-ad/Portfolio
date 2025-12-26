@@ -45,12 +45,15 @@ const Layout = ({ children, profile }) => {
       {/* Top Decorator Line */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500 z-[60] shadow-[0_0_15px_rgba(99,102,241,0.5)]"></div>
 
-      {/* Dynamic Background Blobs */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-[120px] mix-blend-screen animate-blob"></div>
-        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[100px] mix-blend-screen animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-[-10%] left-[20%] w-[700px] h-[700px] bg-emerald-600/10 rounded-full blur-[150px] mix-blend-screen animate-blob animation-delay-4000"></div>
-        <div className="absolute middle-center w-[400px] h-[400px] bg-violet-600/10 rounded-full blur-[120px] mix-blend-screen animate-blob animation-delay-3000 opacity-50"></div>
+      {/* Enhanced Floating Background Blobs */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none select-none">
+        <div className="absolute top-[-5%] left-[-10%] w-[800px] h-[800px] bg-indigo-600/20 rounded-full blur-[140px] mix-blend-screen animate-blob"></div>
+        <div className="absolute top-[10%] right-[-15%] w-[700px] h-[700px] bg-emerald-600/15 rounded-full blur-[120px] mix-blend-screen animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-[-10%] left-[15%] w-[900px] h-[900px] bg-violet-600/15 rounded-full blur-[160px] mix-blend-screen animate-blob animation-delay-4000"></div>
+        <div className="absolute top-[40%] left-[40%] w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[130px] mix-blend-screen animate-blob animation-delay-3000 opacity-50"></div>
+        
+        {/* Subtle Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
       </div>
 
       {/* Navigation */}

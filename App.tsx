@@ -8,9 +8,11 @@ import Admin from './pages/Admin';
 import { getAppData, checkAuth } from './services/storage';
 import { AppData } from './types';
 
-const PrivateRoute = ({ children }: { children: React.ReactElement }) => {
+// Fix: Explicitly use React.ReactNode for children and wrap in a fragment 
+// to ensure it satisfies the Route element prop requirements and avoids type mismatches.
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = checkAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const App: React.FC = () => {

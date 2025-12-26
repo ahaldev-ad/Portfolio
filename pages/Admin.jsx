@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft, Briefcase, GraduationCap, Edit2, ChevronUp } from 'lucide-react';
+import { Save, Plus, Trash2, LogOut, LayoutDashboard, Code, FolderGit2, MessageSquare, Loader2, ArrowLeft, Briefcase, GraduationCap, Edit2, ChevronUp, Menu, X } from 'lucide-react';
 import { getAppData, saveAppData, logoutUser, getEnquiries } from '../services/storage';
 
 const Admin = () => {
@@ -11,6 +11,7 @@ const Admin = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const loadAllData = async () => {
@@ -37,6 +38,12 @@ const Admin = () => {
   const handleLogout = async () => {
     await logoutUser();
     navigate('/');
+  };
+
+  // Tab switching with auto-close sidebar on mobile
+  const switchTab = (tabId) => {
+    setActiveTab(tabId);
+    setIsSidebarOpen(false);
   };
 
   // Generic Update Handlers
@@ -75,28 +82,59 @@ const Admin = () => {
       category: 'Web'
     };
     setData({ ...data, projects: [newProject, ...data.projects] });
-    setEditingProjectId(newId); // Automatically open the new project for editing
+    setEditingProjectId(newId);
   };
 
   const deleteProject = (id, e) => {
-    e.stopPropagation(); // Prevent toggling edit mode if clicking delete
+    e.stopPropagation();
     if (window.confirm('Delete project?')) {
         setData({ ...data, projects: data.projects.filter(p => p.id !== id) });
         if (editingProjectId === id) setEditingProjectId(null);
     }
   };
 
-  // Get unique categories from existing projects for suggestions
   const existingCategories = data ? Array.from(new Set(data.projects.map(p => p.category))) : [];
 
   if (isLoading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-indigo-400"><Loader2 className="animate-spin mr-2" /> Loading Dashboard...</div>;
 
+  const NavItems = [
+    { id: 'profile', icon: LayoutDashboard, label: 'Profile & Bio' },
+    { id: 'skills', icon: Code, label: 'Skills & Highlights' },
+    { id: 'projects', icon: FolderGit2, label: 'Projects' },
+    { id: 'enquiries', icon: MessageSquare, label: 'Enquiries' }
+  ];
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-200 flex flex-col md:flex-row font-sans">
+    <div className="min-h-screen bg-zinc-950 text-zinc-200 flex flex-col md:flex-row font-sans relative overflow-hidden">
       
-      {/* Modern Sidebar */}
-      <aside className="bg-zinc-900 w-full md:w-72 flex-shrink-0 border-r border-zinc-800 flex flex-col">
-        <div className="p-8">
+      {/* Mobile Top Header */}
+      <div className="md:hidden flex items-center justify-between px-6 py-4 bg-zinc-900 border-b border-zinc-800 z-50">
+        <h1 className="text-lg font-bold text-white flex items-center gap-2">
+            <span className="w-2.5 h-2.5 bg-indigo-500 rounded-full"></span>
+            Admin
+        </h1>
+        <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 text-zinc-400 hover:text-white transition-colors"
+        >
+            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Sidebar Overlay for Mobile */}
+      {isSidebarOpen && (
+        <div 
+            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Navigation */}
+      <aside className={`
+        fixed md:relative inset-y-0 left-0 z-40 w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="p-8 hidden md:block">
           <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
             <span className="w-3 h-3 bg-indigo-500 rounded-full"></span>
             Admin Panel
@@ -104,16 +142,11 @@ const Admin = () => {
           <p className="text-xs text-zinc-500 mt-2 ml-5">Content Management</p>
         </div>
         
-        <nav className="flex-grow px-4 space-y-1">
-          {[
-            { id: 'profile', icon: LayoutDashboard, label: 'Profile & Bio' },
-            { id: 'skills', icon: Code, label: 'Skills & Highlights' },
-            { id: 'projects', icon: FolderGit2, label: 'Projects' },
-            { id: 'enquiries', icon: MessageSquare, label: 'Enquiries' }
-          ].map((item) => (
+        <nav className="flex-grow px-4 mt-4 md:mt-0 space-y-1">
+          {NavItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => switchTab(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
                 activeTab === item.id 
                   ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-600/20' 
@@ -136,13 +169,13 @@ const Admin = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-grow h-screen overflow-y-auto bg-zinc-950/50">
-        <div className="p-8 md:p-12 max-w-5xl mx-auto">
+      <main className="flex-grow h-[calc(100vh-64px)] md:h-screen overflow-y-auto bg-zinc-950/50 scroll-smooth">
+        <div className="p-6 md:p-12 max-w-5xl mx-auto">
             
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
+            {/* Context Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold text-white capitalize">{activeTab}</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white capitalize">{activeTab}</h2>
                     <p className="text-zinc-500 text-sm mt-1">Manage your {activeTab} section</p>
                 </div>
                 
@@ -150,7 +183,7 @@ const Admin = () => {
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50 font-medium text-sm"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50 font-medium text-sm"
                     >
                         {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                         {isSaving ? 'Saving...' : 'Save Changes'}
@@ -160,10 +193,10 @@ const Admin = () => {
 
             {/* Profile Tab */}
             {activeTab === 'profile' && (
-                <div className="grid grid-cols-1 gap-8">
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+                <div className="grid grid-cols-1 gap-6 md:gap-8">
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 md:p-6">
                         <h3 className="text-lg font-semibold text-white mb-6 border-b border-zinc-800 pb-4">Personal Details</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                             <InputField label="Full Name" value={data.profile.name} onChange={v => updateProfile('name', v)} />
                             <InputField label="Job Title" value={data.profile.title} onChange={v => updateProfile('title', v)} />
                             <div className="md:col-span-2">
@@ -176,9 +209,9 @@ const Admin = () => {
                         </div>
                     </div>
                     
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 md:p-6">
                         <h3 className="text-lg font-semibold text-white mb-6 border-b border-zinc-800 pb-4">Contact & Media</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                             <InputField label="Email" type="email" value={data.profile.email} onChange={v => updateProfile('email', v)} />
                             <InputField label="Location" value={data.profile.location} onChange={v => updateProfile('location', v)} />
                             <InputField label="GitHub" value={data.profile.github} onChange={v => updateProfile('github', v)} />
@@ -194,10 +227,9 @@ const Admin = () => {
             {/* Skills Tab */}
             {activeTab === 'skills' && (
                 <div className="space-y-8">
-                    {/* Highlights Section (Experience & Learning) */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 md:p-6">
                          <h3 className="text-lg font-semibold text-white mb-6 border-b border-zinc-800 pb-4">Career Highlights</h3>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <Briefcase size={16} className="text-indigo-400" />
@@ -208,7 +240,7 @@ const Admin = () => {
                                     className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                                     value={data.profile.experience || ''}
                                     onChange={e => updateProfile('experience', e.target.value)}
-                                    placeholder="Brief summary of your experience..."
+                                    placeholder="Experience summary..."
                                 />
                             </div>
                             <div>
@@ -221,13 +253,12 @@ const Admin = () => {
                                     className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                                     value={data.profile.learning || ''}
                                     onChange={e => updateProfile('learning', e.target.value)}
-                                    placeholder="What are you currently learning?"
+                                    placeholder="Current learning goals..."
                                 />
                             </div>
                          </div>
                     </div>
 
-                    {/* Technical Skills Section */}
                     <div className="space-y-6">
                          <div className="flex justify-between items-center">
                              <h3 className="text-lg font-semibold text-white">Technical Skills</h3>
@@ -236,11 +267,11 @@ const Admin = () => {
                             </button>
                          </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {data.skills.map(skill => (
                                 <div key={skill.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex items-center gap-4 group hover:border-zinc-700 transition-colors">
                                     <div className="flex-grow grid grid-cols-2 gap-2">
-                                        <input className="bg-transparent border-b border-transparent focus:border-indigo-500 outline-none text-white font-medium" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} placeholder="Skill Name" />
+                                        <input className="bg-transparent border-b border-transparent focus:border-indigo-500 outline-none text-white font-medium" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} placeholder="Skill" />
                                         <input type="number" className="bg-transparent border-b border-transparent focus:border-indigo-500 outline-none text-zinc-400 text-right" value={skill.level} onChange={e => updateSkill(skill.id, 'level', parseInt(e.target.value))} placeholder="%" />
                                         <select className="bg-zinc-950 text-xs text-zinc-400 rounded p-1 outline-none border border-zinc-800" value={skill.category} onChange={e => updateSkill(skill.id, 'category', e.target.value)}>
                                             <option value="Frontend">Frontend</option>
@@ -259,17 +290,16 @@ const Admin = () => {
 
             {/* Projects Tab */}
             {activeTab === 'projects' && (
-                <div className="space-y-8">
-                    <button onClick={addProject} className="w-full py-4 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium">
+                <div className="space-y-6 md:space-y-8">
+                    <button onClick={addProject} className="w-full py-6 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium">
                         <Plus size={20} /> Add New Project
                     </button>
                     <div className="grid grid-cols-1 gap-4">
                         {data.projects.map(project => (
                             <div key={project.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden transition-all">
                                 {editingProjectId === project.id ? (
-                                    // EXPANDED VIEW (Editor)
-                                    <div className="p-6 relative animate-fade-in">
-                                         <div className="absolute top-4 right-4 flex gap-2">
+                                    <div className="p-5 md:p-6 relative animate-fade-in">
+                                         <div className="flex justify-end gap-2 mb-4">
                                             <button onClick={() => setEditingProjectId(null)} className="text-zinc-500 hover:text-white p-2 bg-zinc-800/50 rounded-lg transition-colors" title="Collapse">
                                                 <ChevronUp size={20} />
                                             </button>
@@ -277,7 +307,7 @@ const Admin = () => {
                                                 <Trash2 size={20} />
                                             </button>
                                          </div>
-                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
                                             <div className="lg:col-span-4">
                                                 <div className="aspect-video bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800 mb-4">
                                                     <img src={project.imageUrl} alt="" className="w-full h-full object-cover opacity-70" />
@@ -285,7 +315,7 @@ const Admin = () => {
                                                 <InputField label="Image URL" value={project.imageUrl} onChange={v => updateProject(project.id, 'imageUrl', v)} />
                                             </div>
                                             <div className="lg:col-span-8 space-y-4">
-                                                <div className="grid grid-cols-2 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                     <InputField label="Title" value={project.title} onChange={v => updateProject(project.id, 'title', v)} />
                                                     <div>
                                                         <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Category</label>
@@ -294,14 +324,13 @@ const Admin = () => {
                                                             className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 outline-none focus:border-indigo-500 transition-all placeholder-zinc-700"
                                                             value={project.category}
                                                             onChange={e => updateProject(project.id, 'category', e.target.value)}
-                                                            placeholder="Type new or select below"
                                                         />
                                                         <div className="flex flex-wrap gap-2 mt-2">
                                                             {existingCategories.map(cat => (
                                                                 <button 
                                                                     key={cat}
                                                                     onClick={() => updateProject(project.id, 'category', cat)}
-                                                                    className={`text-xs px-2 py-1 rounded border transition-colors ${
+                                                                    className={`text-[10px] uppercase tracking-tighter px-2 py-0.5 rounded border transition-colors ${
                                                                         project.category === cat 
                                                                         ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
                                                                         : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:text-white'
@@ -318,7 +347,7 @@ const Admin = () => {
                                                     <textarea rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-300 focus:border-indigo-500 outline-none" value={project.description} onChange={e => updateProject(project.id, 'description', e.target.value)} />
                                                 </div>
                                                 <InputField label="Technologies (comma separated)" value={project.technologies.join(', ')} onChange={v => updateProject(project.id, 'technologies', v.split(',').map(t => t.trim()))} />
-                                                <div className="grid grid-cols-2 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                     <InputField label="Demo Link" value={project.demoLink || ''} onChange={v => updateProject(project.id, 'demoLink', v)} />
                                                     <InputField label="Repo Link" value={project.repoLink || ''} onChange={v => updateProject(project.id, 'repoLink', v)} />
                                                 </div>
@@ -326,19 +355,18 @@ const Admin = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    // COMPACT VIEW (Summary)
-                                    <div className="p-4 flex items-center gap-4 hover:bg-zinc-800/30 transition-colors">
-                                        <div className="w-16 h-12 bg-zinc-950 rounded-md overflow-hidden border border-zinc-800 flex-shrink-0">
+                                    <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-zinc-800/30 transition-colors">
+                                        <div className="w-full sm:w-20 h-24 sm:h-14 bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 flex-shrink-0">
                                             <img src={project.imageUrl} alt="" className="w-full h-full object-cover" />
                                         </div>
                                         <div className="flex-grow">
-                                             <h4 className="font-bold text-white text-lg">{project.title}</h4>
+                                             <h4 className="font-bold text-white text-base md:text-lg">{project.title}</h4>
                                              <span className="text-xs text-zinc-500 font-medium">{project.category}</span>
                                         </div>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                                             <button 
                                                 onClick={() => setEditingProjectId(project.id)} 
-                                                className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 rounded-lg transition-all text-sm font-medium border border-indigo-500/20"
+                                                className="flex-grow sm:flex-grow-0 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 rounded-lg transition-all text-sm font-medium border border-indigo-500/20"
                                             >
                                                 <Edit2 size={16} /> Edit
                                             </button>
@@ -361,18 +389,18 @@ const Admin = () => {
             {activeTab === 'enquiries' && (
                 <div className="space-y-4">
                     {enquiries.length === 0 ? (
-                        <div className="text-center py-20 text-zinc-500 bg-zinc-900/50 rounded-2xl border border-zinc-800 border-dashed">
+                        <div className="text-center py-16 text-zinc-500 bg-zinc-900/50 rounded-2xl border border-zinc-800 border-dashed">
                             No enquiries received yet.
                         </div>
                     ) : (
                         enquiries.map(enquiry => (
-                            <div key={enquiry.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl hover:border-indigo-500/30 transition-colors">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h4 className="text-lg font-bold text-white">{enquiry.name}</h4>
-                                    <span className="text-xs text-zinc-500">{new Date(enquiry.createdAt).toLocaleDateString()}</span>
+                            <div key={enquiry.id} className="bg-zinc-900 border border-zinc-800 p-5 md:p-6 rounded-xl hover:border-indigo-500/30 transition-colors">
+                                <div className="flex justify-between items-start mb-2 gap-2">
+                                    <h4 className="text-base md:text-lg font-bold text-white leading-tight">{enquiry.name}</h4>
+                                    <span className="text-[10px] text-zinc-500 whitespace-nowrap">{new Date(enquiry.createdAt).toLocaleDateString()}</span>
                                 </div>
-                                <div className="text-indigo-400 text-sm mb-4">{enquiry.email}</div>
-                                <p className="text-zinc-300 text-sm bg-zinc-950 p-4 rounded-lg border border-zinc-800 leading-relaxed">
+                                <div className="text-indigo-400 text-xs md:text-sm mb-4 truncate">{enquiry.email}</div>
+                                <p className="text-zinc-300 text-sm bg-zinc-950 p-4 rounded-lg border border-zinc-800 leading-relaxed overflow-wrap-anywhere">
                                     {enquiry.message}
                                 </p>
                             </div>
@@ -387,9 +415,8 @@ const Admin = () => {
   );
 };
 
-// Helper Component
 const InputField = ({ label, value, onChange, type = "text" }) => (
-    <div>
+    <div className="w-full">
         <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">{label}</label>
         <input 
             type={type} 

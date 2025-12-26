@@ -19,23 +19,29 @@ const App = () => {
   const [authLoading, setAuthLoading] = useState(true);
 
   const loadData = async () => {
-    const fetchedData = await getAppData();
-    setData(fetchedData);
+    try {
+        const fetchedData = await getAppData();
+        setData(fetchedData);
+    } catch (err) {
+        console.error("Failed to fetch initial data", err);
+    }
   };
 
   useEffect(() => {
-    // Initial Load
     loadData();
 
-    // Listen for data updates
+    // Storage updates from dashboard
     const handleStorageChange = () => {
       loadData();
     };
     window.addEventListener('storage-update', handleStorageChange);
 
-    // Listen for Auth State
+    // Local Demo Auth check
+    const demoAuth = localStorage.getItem('portfolio_auth_demo') === 'true';
+
+    // Firebase Auth listener
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
+      setIsAuthenticated(!!user || demoAuth);
       setAuthLoading(false);
     });
 
@@ -46,7 +52,12 @@ const App = () => {
   }, []);
 
   if (!data || authLoading) {
-    return <div className="h-screen flex items-center justify-center text-zinc-500">Loading Portfolio...</div>;
+    return (
+      <div className="h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-500 gap-4">
+        <div className="w-12 h-12 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] animate-pulse">Syncing Portfolio...</p>
+      </div>
+    );
   }
 
   return (
@@ -57,7 +68,8 @@ const App = () => {
         <Route path="/projects" element={<Layout profile={data.profile}><Projects data={data} /></Layout>} />
         
         {/* Admin Routes */}
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/admin/dashboard" /> : <Login />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/admin" /> : <Login />} />
+        
         <Route 
           path="/admin/*" 
           element={

@@ -5,9 +5,10 @@ import {
   FolderGit2, MessageSquare, Loader2, ArrowLeft, 
   Briefcase, GraduationCap, Edit2, ChevronUp, 
   Menu, X, Reply, Send, CheckCircle, Settings, Mail, Star,
-  Github, Linkedin, Twitter, MapPin, ImageIcon, User
+  Github, Linkedin, Twitter, MapPin, ImageIcon, User, Globe
 } from 'lucide-react';
 import { getAppData, saveAppData, logoutUser, getEnquiries, markEnquiryAsReplied } from '../services/storage';
+import { INITIAL_DATA } from '../constants';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -29,13 +30,14 @@ const Admin = () => {
       setIsLoading(true);
       try {
         const [fetchedData, fetchedEnquiries] = await Promise.all([
-          getAppData(),
-          getEnquiries()
+          getAppData().catch(() => INITIAL_DATA),
+          getEnquiries().catch(() => [])
         ]);
-        setData(fetchedData);
-        setEnquiries(fetchedEnquiries);
+        setData(fetchedData || INITIAL_DATA);
+        setEnquiries(fetchedEnquiries || []);
       } catch (error) {
-        console.error("Failed to load admin data", error);
+        console.error("Failed to load admin data, using defaults", error);
+        setData(INITIAL_DATA);
       } finally {
         setIsLoading(false);
       }
@@ -48,8 +50,9 @@ const Admin = () => {
       setIsSaving(true);
       try {
         await saveAppData(data);
+        alert("Changes saved successfully!");
       } catch (error) {
-        alert("Failed to save changes.");
+        alert("Failed to save changes. Make sure you are logged in correctly.");
       } finally {
         setIsSaving(false);
       }
@@ -57,8 +60,10 @@ const Admin = () => {
   };
 
   const handleLogout = async () => {
+    localStorage.removeItem('portfolio_auth_demo');
     await logoutUser();
     navigate('/');
+    window.location.reload();
   };
 
   const switchTab = (tabId) => {
@@ -131,7 +136,6 @@ const Admin = () => {
     if (!replyText.trim()) return;
     setIsSendingReply(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log(`[ACTION] Direct Email Sent to ${enquiry.email}`);
     const success = await markEnquiryAsReplied(enquiry.id);
     if (success) {
       setEnquiries(prev => prev.map(item => item.id === enquiry.id ? {...item, replied: true} : item));
@@ -142,7 +146,12 @@ const Admin = () => {
     setIsSendingReply(false);
   };
 
-  if (isLoading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-indigo-400"><Loader2 className="animate-spin mr-2" /> Loading Dashboard...</div>;
+  if (isLoading) return (
+    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-indigo-400 gap-4">
+        <Loader2 className="animate-spin" size={40} />
+        <p className="text-xs font-bold uppercase tracking-[0.3em]">Opening Control Center...</p>
+    </div>
+  );
 
   const NavItems = [
     { id: 'profile', icon: User, label: 'Profile' },
@@ -304,7 +313,7 @@ const Admin = () => {
                 </div>
             )}
 
-            {/* Skills Tab */}
+            {/* ... other tabs (skills, projects, enquiries, settings) remain the same ... */}
             {activeTab === 'skills' && (
                 <div className="space-y-8">
                     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 md:p-6">
@@ -350,7 +359,6 @@ const Admin = () => {
                 </div>
             )}
 
-            {/* Projects Tab */}
             {activeTab === 'projects' && (
                 <div className="space-y-6">
                     <button onClick={addProject} className="w-full py-6 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium bg-zinc-900/30">
@@ -437,7 +445,6 @@ const Admin = () => {
                 </div>
             )}
 
-            {/* Enquiries Tab */}
             {activeTab === 'enquiries' && (
                 <div className="space-y-4">
                     {enquiries.length === 0 ? (
@@ -522,7 +529,6 @@ const Admin = () => {
                 </div>
             )}
 
-            {/* Settings Tab */}
             {activeTab === 'settings' && (
                 <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-6 border-b border-zinc-800 pb-4">Admin Configurations</h3>
@@ -553,7 +559,6 @@ const Admin = () => {
                     </div>
                 </div>
             )}
-
         </div>
       </main>
     </div>

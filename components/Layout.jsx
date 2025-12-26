@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Github, Linkedin, Mail, Settings } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Mail } from 'lucide-react';
 
 const Layout = ({ children, profile }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -37,7 +37,6 @@ const Layout = ({ children, profile }) => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Projects', path: '/projects' },
-    { name: 'Dashboard', path: '/admin', icon: <Settings size={14} /> },
   ];
 
   return (
@@ -76,12 +75,12 @@ const Layout = ({ children, profile }) => {
                   key={link.name}
                   to={link.path}
                   className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 flex items-center gap-2 ${
-                    location.pathname.startsWith(link.path) && link.path !== '/' || (location.pathname === '/' && link.path === '/')
+                    location.pathname === link.path
                       ? 'text-white bg-white/10 shadow-inner border border-white/10'
                       : 'text-zinc-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  {link.icon} {link.name}
+                  {link.name}
                 </Link>
               ))}
             </div>
@@ -152,8 +151,8 @@ const Layout = ({ children, profile }) => {
              <div className="text-[10px] text-zinc-600 uppercase tracking-[0.2em] font-bold">
                 © {new Date().getFullYear()} {profile.name} • Built with Passion
              </div>
-             <Link to="/admin" className="text-zinc-500 hover:text-indigo-400 transition-all text-xs uppercase font-bold tracking-widest bg-zinc-900/50 px-4 py-2 rounded-lg border border-zinc-800 hover:border-indigo-500/30">
-                Admin Control Panel
+             <Link to="/admin" className="text-zinc-900 hover:text-indigo-900 transition-colors text-[10px] uppercase font-black tracking-widest select-none">
+                Control Panel
              </Link>
           </div>
         </div>

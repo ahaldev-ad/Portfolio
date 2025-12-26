@@ -9,6 +9,7 @@ export const INITIAL_DATA = {
     email: "hello@alexdev.com",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
+    twitter: "https://twitter.com",
     location: "San Francisco, CA",
     heroImage: "https://picsum.photos/400/400"
   },

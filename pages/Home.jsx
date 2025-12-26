@@ -37,11 +37,11 @@ const Home = ({ data }) => {
 
   const getCategoryIcon = (category) => {
     switch(category) {
-        case 'Frontend': return <Layout size={20} />;
-        case 'Backend': return <Database size={20} />;
-        case 'Tools': return <Terminal size={20} />;
-        case 'Design': return <Code2 size={20} />;
-        default: return <Code2 size={20} />;
+        case 'Frontend': return <Layout size={20} className="text-indigo-400" />;
+        case 'Backend': return <Database size={20} className="text-violet-400" />;
+        case 'Tools': return <Terminal size={20} className="text-emerald-400" />;
+        case 'Design': return <Code2 size={20} className="text-rose-400" />;
+        default: return <Cpu size={20} className="text-indigo-400" />;
     }
   };
 
@@ -102,7 +102,7 @@ const Home = ({ data }) => {
       </section>
 
       {/* About Section */}
-      <section className="py-24 relative">
+      <section className="py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <div className="order-2 lg:order-1 reveal">
@@ -137,6 +137,48 @@ const Home = ({ data }) => {
                     </div>
                 </div>
             </div>
+        </div>
+      </section>
+
+      {/* Skills Arsenal Section */}
+      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-zinc-900/50">
+        <div className="reveal mb-16">
+          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Technical Arsenal</h2>
+          <p className="text-zinc-500 max-w-2xl">The technologies and tools I use to bring ideas to life, curated over years of building software.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {Object.entries(groupedSkills).map(([category, items], idx) => (
+            <div key={category} className={`reveal delay-${(idx + 1) * 100} bg-zinc-900/30 border border-zinc-800/50 rounded-3xl p-8 backdrop-blur-sm hover:border-indigo-500/30 transition-all duration-300`}>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800">
+                  {getCategoryIcon(category)}
+                </div>
+                <h3 className="text-xl font-bold text-white">{category}</h3>
+              </div>
+              <div className="space-y-6">
+                {items.map((skill) => (
+                  <div key={skill.id} className="group">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">{skill.name}</span>
+                      <span className="text-[10px] font-bold text-zinc-500 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800 uppercase tracking-tighter">
+                        {skill.level}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-zinc-950 rounded-full overflow-hidden border border-zinc-800/50">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-1000 ease-out delay-500 bg-gradient-to-r 
+                          ${category === 'Frontend' ? 'from-indigo-600 to-indigo-400' : 
+                            category === 'Backend' ? 'from-violet-600 to-violet-400' : 
+                            category === 'Design' ? 'from-rose-600 to-rose-400' : 'from-emerald-600 to-emerald-400'}`}
+                        style={{ width: `${skill.level}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

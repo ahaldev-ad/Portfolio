@@ -12,6 +12,10 @@ export const INITIAL_DATA = {
     location: "San Francisco, CA",
     heroImage: "https://picsum.photos/400/400"
   },
+  settings: {
+    senderEmail: "admin@alexdev.com",
+    emailServiceName: "Default API"
+  },
   skills: [
     { id: '1', name: 'React', category: 'Frontend', level: 95 },
     { id: '2', name: 'TypeScript', category: 'Frontend', level: 90 },

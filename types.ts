@@ -6,6 +6,7 @@ export interface Project {
   imageUrl: string;
   demoLink?: string;
   repoLink?: string;
+  isFeatured?: boolean;
   category: 'Web' | 'Mobile' | 'Design' | 'Other';
 }
 
@@ -21,6 +22,8 @@ export interface Profile {
   title: string;
   tagline: string;
   about: string;
+  experience?: string;
+  learning?: string;
   email: string;
   github: string;
   linkedin: string;
@@ -33,6 +36,10 @@ export interface AppData {
   profile: Profile;
   skills: Skill[];
   projects: Project[];
+  settings?: {
+    senderEmail?: string;
+    emailServiceName?: string;
+  };
 }
 
 export interface AuthState {

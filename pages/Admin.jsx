@@ -4,7 +4,7 @@ import {
   Save, Plus, Trash2, LogOut, LayoutDashboard, Code, 
   FolderGit2, MessageSquare, Loader2, ArrowLeft, 
   Briefcase, GraduationCap, Edit2, ChevronUp, 
-  Menu, X, Reply, Send, CheckCircle, Settings, Mail 
+  Menu, X, Reply, Send, CheckCircle, Settings, Mail, Star
 } from 'lucide-react';
 import { getAppData, saveAppData, logoutUser, getEnquiries, markEnquiryAsReplied } from '../services/storage';
 
@@ -103,7 +103,8 @@ const Admin = () => {
       description: 'Project description...',
       technologies: [],
       imageUrl: 'https://picsum.photos/600/400',
-      category: 'Web'
+      category: 'Web',
+      isFeatured: false
     };
     setData({ ...data, projects: [newProject, ...data.projects] });
     setEditingProjectId(newId);
@@ -130,15 +131,10 @@ const Admin = () => {
     
     setIsSendingReply(true);
     
-    // Simulation of a direct email dispatch via an API (like EmailJS or SendGrid)
-    // We wait 1.5s to show the loading state
+    // Simulation of a direct email dispatch
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Log simulation data for debugging
-    console.log(`[ACTION] Direct Email Sent`);
-    console.log(`[TO] ${enquiry.email}`);
-    console.log(`[FROM] ${data.settings?.senderEmail || data.profile.email}`);
-    console.log(`[BODY] ${replyText}`);
+    console.log(`[ACTION] Direct Email Sent to ${enquiry.email}`);
     
     const success = await markEnquiryAsReplied(enquiry.id);
     if (success) {
@@ -325,13 +321,26 @@ const Admin = () => {
                             <div key={project.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
                                 {editingProjectId === project.id ? (
                                     <div className="p-6">
-                                         <div className="flex justify-end gap-2 mb-4">
-                                            <button onClick={() => setEditingProjectId(null)} className="text-zinc-500 hover:text-white p-2 bg-zinc-800/50 rounded-lg" title="Collapse">
-                                                <ChevronUp size={20} />
-                                            </button>
-                                            <button onClick={(e) => deleteProject(project.id, e)} className="text-zinc-500 hover:text-red-400 p-2 bg-zinc-800/50 rounded-lg" title="Delete">
-                                                <Trash2 size={20} />
-                                            </button>
+                                         <div className="flex justify-between items-center mb-4">
+                                            <div className="flex items-center gap-4">
+                                                <label className="flex items-center gap-2 cursor-pointer group">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        className="w-4 h-4 rounded border-zinc-800 bg-zinc-950 text-indigo-600 focus:ring-indigo-500"
+                                                        checked={project.isFeatured || false} 
+                                                        onChange={e => updateProject(project.id, 'isFeatured', e.target.checked)} 
+                                                    />
+                                                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest group-hover:text-indigo-400 transition-colors">Featured on Home</span>
+                                                </label>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => setEditingProjectId(null)} className="text-zinc-500 hover:text-white p-2 bg-zinc-800/50 rounded-lg" title="Collapse">
+                                                    <ChevronUp size={20} />
+                                                </button>
+                                                <button onClick={(e) => deleteProject(project.id, e)} className="text-zinc-500 hover:text-red-400 p-2 bg-zinc-800/50 rounded-lg" title="Delete">
+                                                    <Trash2 size={20} />
+                                                </button>
+                                            </div>
                                          </div>
                                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                                             <div className="lg:col-span-4">
@@ -359,11 +368,19 @@ const Admin = () => {
                                     </div>
                                 ) : (
                                     <div className="p-4 flex flex-col sm:flex-row items-center gap-4 hover:bg-zinc-800/30 transition-colors">
-                                        <div className="w-20 h-14 bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 flex-shrink-0">
+                                        <div className="w-20 h-14 bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 flex-shrink-0 relative">
                                             <img src={project.imageUrl} alt="" className="w-full h-full object-cover" />
+                                            {project.isFeatured && (
+                                                <div className="absolute top-1 right-1 p-0.5 bg-indigo-600 rounded-full shadow-lg">
+                                                    <Star size={10} className="text-white fill-white" />
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex-grow">
-                                             <h4 className="font-bold text-white">{project.title}</h4>
+                                             <div className="flex items-center gap-2">
+                                                <h4 className="font-bold text-white">{project.title}</h4>
+                                                {project.isFeatured && <Star size={14} className="text-indigo-400 fill-indigo-400" />}
+                                             </div>
                                              <span className="text-xs text-zinc-500">{project.category}</span>
                                         </div>
                                         <div className="flex gap-2">

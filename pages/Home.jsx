@@ -6,7 +6,9 @@ import { sendEnquiry } from '../services/storage';
 
 const Home = ({ data }) => {
   const { profile, skills, projects } = data;
-  const featuredProjects = projects.slice(0, 2);
+  
+  // Only show projects explicitly marked as featured
+  const featuredProjects = projects.filter(p => p.isFeatured);
   
   // Contact Form State
   const [formState, setFormState] = useState({ name: '', email: '', message: '' });
@@ -94,25 +96,6 @@ const Home = ({ data }) => {
                             <Mail size={20} />
                         </a>
                     </div>
-                    
-                    <div className="flex items-center gap-8 mt-4 pt-8 border-t border-zinc-800/50 w-full max-w-lg mx-auto justify-center opacity-60 hover:opacity-100 transition-opacity duration-500">
-                        <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
-                            <Cpu size={16} /> <span>Engineering</span>
-                        </div>
-                         <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
-                            <Globe size={16} /> <span>Development</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
-                            <Layout size={16} /> <span>Design</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            {/* Scroll Indicator */}
-            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-zinc-600 reveal delay-500 hidden lg:block">
-                <div className="w-6 h-10 border-2 border-zinc-600 rounded-full flex justify-center pt-2">
-                    <div className="w-1 h-2 bg-zinc-600 rounded-full"></div>
                 </div>
             </div>
         </div>
@@ -157,63 +140,28 @@ const Home = ({ data }) => {
         </div>
       </section>
 
-      {/* Skills Section */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20 reveal">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Technical Arsenal</h2>
-            <p className="text-zinc-500 max-w-2xl mx-auto">Tools and technologies I use to craft exceptional digital experiences.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Object.keys(groupedSkills).map((category, index) => (
-                <div key={category} className={`bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800 hover:border-indigo-500/30 hover:bg-zinc-900/60 transition-all group reveal delay-${Math.min((index + 1) * 100, 500)}`}>
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2.5 bg-zinc-800 rounded-lg text-indigo-400 group-hover:text-white group-hover:bg-indigo-600 transition-colors">
-                            {getCategoryIcon(category)}
-                        </div>
-                        <h3 className="font-bold text-lg text-white">{category}</h3>
-                    </div>
-                    <div className="space-y-4">
-                        {groupedSkills[category].map(skill => (
-                            <div key={skill.id}>
-                                <div className="flex justify-between mb-1.5">
-                                    <span className="text-sm font-medium text-zinc-300">{skill.name}</span>
-                                    <span className="text-xs text-zinc-500">{skill.level}%</span>
-                                </div>
-                                <div className="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
-                                    <div 
-                                        className="bg-indigo-500 h-1.5 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" 
-                                        style={{ width: `${skill.level}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ))}
-        </div>
-      </section>
-
       {/* Featured Projects */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-zinc-900/50">
-        <div className="flex flex-col sm:flex-row justify-between items-end mb-12 gap-4 reveal">
-            <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">Featured Work</h2>
-                <p className="text-zinc-500">Highlights from my portfolio.</p>
-            </div>
-            <Link to="/projects" className="inline-flex items-center font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
-                View All Projects <ArrowRight size={16} className="ml-2" />
-            </Link>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {featuredProjects.map((project, index) => (
-                <div key={project.id} className={`reveal delay-${(index + 1) * 100}`}>
-                    <ProjectCard project={project} />
-                </div>
-            ))}
-        </div>
-      </section>
+      {featuredProjects.length > 0 && (
+        <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-zinc-900/50">
+          <div className="flex flex-col sm:flex-row justify-between items-end mb-12 gap-4 reveal">
+              <div>
+                  <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">Featured Work</h2>
+                  <p className="text-zinc-500">Selected projects from my portfolio.</p>
+              </div>
+              <Link to="/projects" className="inline-flex items-center font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                  View All Projects <ArrowRight size={16} className="ml-2" />
+              </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {featuredProjects.map((project, index) => (
+                  <div key={project.id} className={`reveal delay-${(index + 1) * 100}`}>
+                      <ProjectCard project={project} />
+                  </div>
+              ))}
+          </div>
+        </section>
+      )}
 
       {/* Contact / Enquiry Section */}
       <section id="contact" className="py-24 bg-zinc-900/30 relative">

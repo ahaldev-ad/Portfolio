@@ -32,6 +32,7 @@ export const INITIAL_DATA = {
       technologies: ['React', 'D3.js', 'Firebase'],
       imageUrl: 'https://picsum.photos/600/400?random=1',
       category: 'Web',
+      isFeatured: true,
       demoLink: 'https://example.com',
       repoLink: 'https://github.com'
     },
@@ -42,6 +43,7 @@ export const INITIAL_DATA = {
       technologies: ['React Native', 'Redux', 'Node.js'],
       imageUrl: 'https://picsum.photos/600/400?random=2',
       category: 'Mobile',
+      isFeatured: true,
       repoLink: 'https://github.com'
     },
     {
@@ -51,6 +53,7 @@ export const INITIAL_DATA = {
       technologies: ['Gatsby', 'GraphQL', 'Styled Components'],
       imageUrl: 'https://picsum.photos/600/400?random=3',
       category: 'Web',
+      isFeatured: false,
       demoLink: 'https://example.com'
     }
   ]
